@@ -1,0 +1,108 @@
+---------- Cuestión 0
+SELECT pg_reload_conf();
+
+---------- Cuestión 2
+
+-- Borramos las tablas para en caso de necesidad relanzarlos sin problemas
+DROP TABLE IF EXISTS public.matriculas;
+DROP TABLE IF EXISTS public.asignaturas;
+DROP TABLE IF EXISTS public.estudiantes;
+
+-- Creamos las tablas pedidas
+CREATE TABLE public.estudiantes(
+    carnet NUMERIC PRIMARY KEY,
+    nombre TEXT,
+    apellidos TEXT,
+    creditos NUMERIC
+);
+
+CREATE TABLE public.asignaturas(
+    codigo NUMERIC PRIMARY KEY,
+    nombre TEXT,
+    caracter TEXT,
+    creditos NUMERIC
+);
+
+CREATE TABLE public.matriculas(
+    carnet_estu NUMERIC,
+    codigo_asig NUMERIC,
+    nota NUMERIC,
+
+    CONSTRAINT pk_matriculas PRIMARY KEY (carnet_estu, codigo_asig),
+
+    CONSTRAINT fk_matriculas_estudiantes FOREIGN KEY (carnet_estu) REFERENCES public.estudiantes(carnet) ON DELETE RESTRICT ON UPDATE RESTRICT,
+
+    CONSTRAINT fk_matriculas_asignaturas FOREIGN KEY (codigo_asig) REFERENCES public.asignaturas(codigo) ON DELETE RESTRICT ON UPDATE RESTRICT
+);
+
+-- Importamos los datos en las tablas
+COPY public.estudiantes(carnet, nombre, apellidos, creditos)
+FROM 'C:\database_UAH\BD\PL2\datos_estudiantes.csv'
+WITH (FORMAT csv, HEADER false, DELIMITER ',');
+
+COPY public.asignaturas(codigo, nombre, caracter, creditos)
+FROM 'C:\database_UAH\BD\PL2\datos_asignaturas.csv'
+WITH (FORMAT csv, HEADER false, DELIMITER ',');
+
+COPY public.matriculas(carnet_estu, codigo_asig, nota)
+FROM 'C:\database_UAH\BD\PL2\datos_matriculas.csv'
+WITH (FORMAT csv, HEADER false, DELIMITER ',');
+
+-- Actualizamos estadísticas
+ANALYZE public.estudiantes;
+ANALYZE public.asignaturas;
+ANALYZE public.matriculas;
+
+---------- Cuestión 3
+
+
+
+---------- Cuestión 4
+
+
+
+---------- Cuestión 5
+
+
+
+---------- Cuestión 6
+
+
+
+---------- Cuestión 7
+
+
+
+---------- Cuestión 8
+
+
+
+---------- Cuestión 9
+
+
+
+---------- Cuestión 10
+
+
+
+---------- Cuestión 11
+
+
+
+---------- Cuestión 12
+
+
+
+---------- Cuestión 13
+
+
+
+---------- Cuestión 14
+
+
+
+---------- Cuestión 15
+
+
+
+---------- Cuestión 16
