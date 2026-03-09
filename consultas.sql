@@ -55,15 +55,65 @@ ANALYZE public.matriculas;
 
 ---------- Cuestión 3
 
-
+-- Veamos las estadísticas de cada tabla
+SELECT * FROM pg_stats WHERE tablename IN ('estudiantes', 'asignaturas', 'matriculas');
 
 ---------- Cuestión 4
 
+-- Aplicar Explain a la consulta
 
+EXPLAIN SELECT COUNT(*)
+FROM public.estudiantes
+WHERE creditos < 100;
+
+-- Para poder comparar con la teoría necesito:
+
+    -- Valor real
+SELECT COUNT(*)
+FROM public.estudiantes
+WHERE creditos < 100;
+
+    -- El total de filas
+SELECT reltuples FROM pg_class WHERE relname = 'estudiantes';
 
 ---------- Cuestión 5
 
+-- Aplico el comando EXPLAIN a la consulta
+EXPLAIN SELECT nombre
+FROM public.estudiantes
+WHERE creditos = 150 AND carnet IN (
+    SELECT carnet_estu
+    FROM public.matriculas
+    WHERE nota >= 5
+    GROUP BY carnet_estu
+    HAVING COUNT(*) >= 3
+);
 
+-- Para poder comparar con la teoría necesito:
+
+    -- Valor real
+SELECT nombre
+FROM public.estudiantes
+WHERE creditos = 150 AND carnet IN (
+    SELECT carnet_estu
+    FROM public.matriculas
+    WHERE nota >= 5
+    GROUP BY carnet_estu
+    HAVING COUNT(*) >= 3
+);
+
+    -- Estadísticas de créditos=150
+SELECT most_common_vals, most_common_freqs
+FROM pg_stats
+WHERE tablename = 'estudiantes' AND attname = 'creditos';
+
+    -- Estadísticas de nota>=5
+SELECT most_common_vals, most_common_freqs
+FROM pg_stats
+WHERE tablename = 'matriculas' AND attname = 'nota';
+
+    -- El total de filas
+SELECT reltuples FROM pg_class WHERE relname = 'estudiantes';
 
 ---------- Cuestión 6
 
