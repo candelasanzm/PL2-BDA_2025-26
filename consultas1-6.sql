@@ -1,3 +1,5 @@
+-- Todo lo que ejecutemos relativo a este fichero se ejecuta en la base de datos matriculas
+
 ---------- Cuestión 0
 SELECT pg_reload_conf();
 
@@ -114,45 +116,20 @@ WHERE tablename = 'matriculas' AND attname = 'nota';
 
     -- El total de filas
 SELECT reltuples FROM pg_class WHERE relname = 'estudiantes';
+SELECT reltuples FROM pg_class WHERE relname = 'matriculas';
 
 ---------- Cuestión 6
 
+-- Aplico EXPLAIN
+EXPLAIN SELECT DISTINCT a.nombre
+FROM public.asignaturas a
+JOIN public.matriculas m ON a.codigo = m.codigo_asig
+JOIN public.estudiantes e ON m.carnet_estu = e.carnet
+WHERE a.creditos = 10 AND m.nota = 7 AND e.creditos = 50;
 
-
----------- Cuestión 7
-
-
-
----------- Cuestión 8
-
-
-
----------- Cuestión 9
-
-
-
----------- Cuestión 10
-
-
-
----------- Cuestión 11
-
-
-
----------- Cuestión 12
-
-
-
----------- Cuestión 13
-
-
-
----------- Cuestión 14
-
-
-
----------- Cuestión 15
-
-
-
----------- Cuestión 16
+-- Valor real
+SELECT COUNT(DISTINCT a.nombre)
+FROM public.asignaturas a
+JOIN public.matriculas m ON a.codigo = m.codigo_asig
+JOIN public.estudiantes e ON m.carnet_estu = e.carnet
+WHERE a.creditos = 10 AND m.nota = 7 AND e.creditos = 50;
