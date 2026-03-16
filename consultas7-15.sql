@@ -222,7 +222,3 @@ WHERE codigo_musico IN (
 
 
 ---------- Cuestión 15
-
-
-
----------- Cuestión 16
