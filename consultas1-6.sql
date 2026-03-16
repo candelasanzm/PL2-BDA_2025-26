@@ -133,3 +133,21 @@ FROM public.asignaturas a
 JOIN public.matriculas m ON a.codigo = m.codigo_asig
 JOIN public.estudiantes e ON m.carnet_estu = e.carnet
 WHERE a.creditos = 10 AND m.nota = 7 AND e.creditos = 50;
+
+-- Numero de valores distintos
+SELECT n_distinct
+FROM pg_stats
+WHERE tablename = 'asignaturas' AND attname = 'creditos';
+
+-- Media estudiantes por matricula
+SELECT AVG(repeticiones)
+FROM (
+         SELECT a.nombre, COUNT(*) AS repeticiones
+         FROM estudiantes e
+                  JOIN matriculas m ON e.carnet = m.carnet_estu
+                  JOIN asignaturas a ON a.codigo = m.codigo_asig
+         WHERE e.creditos = 50
+           AND m.nota = 7
+           AND a.creditos = 10
+         GROUP BY a.nombre
+     ) t;

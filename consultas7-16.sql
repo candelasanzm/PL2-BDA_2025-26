@@ -139,15 +139,75 @@ ANALYZE public."Entradas";
 
 ---------- Cuestión 9
 
-
+EXPLAIN ANALYZE
+SELECT COUNT(*) * 100 / (SELECT COUNT(*) FROM public."Musicos") AS porcentaje
+FROM public."Musicos" m
+WHERE m."Codigo_grupo_Grupo" IN (
+    SELECT "Codigo_grupo_Grupo"
+    FROM public."Musicos"
+    GROUP BY "Codigo_grupo_Grupo"
+    HAVING COUNT(*) > 3
+)
+AND m."Codigo_grupo_Grupo" IN (
+    SELECT gtc."Codigo_grupo_Grupo"
+    FROM public."Grupos_Tocan_Conciertos" gtc
+    JOIN public."Conciertos" c ON gtc."Codigo_concierto_Conciertos" = c."Codigo_concierto"
+    JOIN public."Entradas" e ON c."Codigo_concierto" = e."Codigo_concierto_Conciertos"
+    WHERE c."Pais" = 'España'
+    AND e."Precio" BETWEEN '20' AND '50'
+)
+AND m."Codigo_grupo_Grupo" IN (
+    SELECT d."Codigo_grupo_Grupo"
+    FROM public."Discos" d
+    JOIN public."Canciones" ca ON d."Codigo_disco" = ca."Codigo_disco_Discos"
+    WHERE d."Genero" = 'rock'
+    AND ca."Duracion" > '00:03:00'
+);
 
 ---------- Cuestión 10
 
+-- Lo mejor para optimizar la consulta anterior es crear un índice sobre los campos que se usan en la consulta 9
+CREATE INDEX idx_conciertos_pais ON public."Conciertos" ("Pais");
+CREATE INDEX idx_entradas_precio ON public."Entradas"("Precio");
+CREATE INDEX idx_discos_genero ON public."Discos"("Genero");
+CREATE INDEX idx_canciones_duracion ON public."Canciones"("Duracion");
+CREATE INDEX idx_musicos_grupo ON public."Musicos"("Codigo_grupo_Grupo");
 
+EXPLAIN ANALYZE
+SELECT COUNT(*) * 100 / (SELECT COUNT(*) FROM public."Musicos") AS porcentaje
+FROM public."Musicos" m
+WHERE m."Codigo_grupo_Grupo" IN (
+    SELECT "Codigo_grupo_Grupo"
+    FROM public."Musicos"
+    GROUP BY "Codigo_grupo_Grupo"
+    HAVING COUNT(*) > 3
+)
+AND m."Codigo_grupo_Grupo" IN (
+    SELECT gtc."Codigo_grupo_Grupo"
+    FROM public."Grupos_Tocan_Conciertos" gtc
+    JOIN public."Conciertos" c ON gtc."Codigo_concierto_Conciertos" = c."Codigo_concierto"
+    JOIN public."Entradas" e ON c."Codigo_concierto" = e."Codigo_concierto_Conciertos"
+    WHERE c."Pais" = 'España'
+    AND e."Precio" BETWEEN '20' AND '50'
+)
+AND m."Codigo_grupo_Grupo" IN (
+    SELECT d."Codigo_grupo_Grupo"
+    FROM public."Discos" d
+    JOIN public."Canciones" ca ON d."Codigo_disco" = ca."Codigo_disco_Discos"
+    WHERE d."Genero" = 'rock'
+    AND ca."Duracion" > '00:03:00'
+);
 
 ---------- Cuestión 11
 
-
+EXPLAIN ANALYZE
+DELETE FROM public."Musicos"
+WHERE codigo_musico IN (
+    SELECT codigo_musico
+    FROM public."Musicos"
+    ORDER BY random()
+    LIMIT 300000
+);
 
 ---------- Cuestión 12
 
