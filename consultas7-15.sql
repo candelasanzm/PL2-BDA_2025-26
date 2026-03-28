@@ -211,14 +211,63 @@ WHERE codigo_musico IN (
 
 ---------- Cuestión 12
 
-
-
----------- Cuestión 13
-
-
+EXPLAIN ANALYZE
+SELECT COUNT(*) * 100 / (SELECT COUNT(*) FROM public."Musicos") AS porcentaje
+FROM public."Musicos" m
+WHERE m."Codigo_grupo_Grupo" IN (
+    SELECT "Codigo_grupo_Grupo"
+    FROM public."Musicos"
+    GROUP BY "Codigo_grupo_Grupo"
+    HAVING COUNT(*) > 3
+)
+AND m."Codigo_grupo_Grupo" IN (
+    SELECT gtc."Codigo_grupo_Grupo"
+    FROM public."Grupos_Tocan_Conciertos" gtc
+    JOIN public."Conciertos" c ON gtc."Codigo_concierto_Conciertos" = c."Codigo_concierto"
+    JOIN public."Entradas" e ON c."Codigo_concierto" = e."Codigo_concierto_Conciertos"
+    WHERE c."Pais" = 'España'
+    AND e."Precio" BETWEEN '20' AND '50'
+)
+AND m."Codigo_grupo_Grupo" IN (
+    SELECT d."Codigo_grupo_Grupo"
+    FROM public."Discos" d
+    JOIN public."Canciones" ca ON d."Codigo_disco" = ca."Codigo_disco_Discos"
+    WHERE d."Genero" = 'rock'
+    AND ca."Duracion" > '00:03:00'
+);
 
 ---------- Cuestión 14
 
+-- Realizamos las propuestas de optimizacion de la cuestion 13
+DROP INDEX IF EXISTS idx_entradas_precio;
+DROP INDEX IF EXISTS idx_canciones_duracion;
+CREATE INDEX idx_entradas_precio_rango ON public."Entradas" ("Precio")
+WHERE "Precio" BETWEEN '20' AND '50';
+CREATE INDEX idx_canciones_duracion_rango ON public."Canciones" ("Duracion")
+WHERE "Duracion" > '00:03:00';
+VACUUM ANALYZE;
 
-
----------- Cuestión 15
+EXPLAIN ANALYZE
+SELECT COUNT(*) * 100 / (SELECT COUNT(*) FROM public."Musicos") AS porcentaje
+FROM public."Musicos" m
+WHERE m."Codigo_grupo_Grupo" IN (
+    SELECT "Codigo_grupo_Grupo"
+    FROM public."Musicos"
+    GROUP BY "Codigo_grupo_Grupo"
+    HAVING COUNT(*) > 3
+)
+AND m."Codigo_grupo_Grupo" IN (
+    SELECT gtc."Codigo_grupo_Grupo"
+    FROM public."Grupos_Tocan_Conciertos" gtc
+    JOIN public."Conciertos" c ON gtc."Codigo_concierto_Conciertos" = c."Codigo_concierto"
+    JOIN public."Entradas" e ON c."Codigo_concierto" = e."Codigo_concierto_Conciertos"
+    WHERE c."Pais" = 'España'
+    AND e."Precio" BETWEEN '20' AND '50'
+)
+AND m."Codigo_grupo_Grupo" IN (
+    SELECT d."Codigo_grupo_Grupo"
+    FROM public."Discos" d
+    JOIN public."Canciones" ca ON d."Codigo_disco" = ca."Codigo_disco_Discos"
+    WHERE d."Genero" = 'rock'
+    AND ca."Duracion" > '00:03:00'
+);
